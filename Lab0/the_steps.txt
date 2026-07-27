@@ -1,0 +1,246 @@
+Complete Lab 0 Setup Guide (Corrected & Updated)
+
+This guide is based on your lecturer’s cheatsheet but updated to resolve all the issues we encountered:
+
+    LocalStack authentication → use localstack/localstack:4.13.1 (no token required)
+
+    kind installation and kubectl context
+
+    AWS CLI endpoint and credential setup
+
+    Docker permission issues (using sudo or adding user to docker group)
+
+    Important: All commands assume you are on Linux (Ubuntu/Debian).
+    If you are on macOS or Windows, adapt the install commands accordingly (see original cheatsheet).
+
+Before You Start
+
+    Ensure your system has at least 4 GB of RAM and virtualization enabled in BIOS.
+
+    For Linux, if you don’t want to type sudo for every Docker command, add yourself to the docker group now and log out and back in:
+    bash
+
+sudo usermod -aG docker $USER
+# Then log out or run: newgrp docker
+
+    We will use sudo for Docker and kind commands only if you haven't done the above.
+
+1. Install Docker
+bash
+
+# Install Docker (Ubuntu)
+curl -fsSL https://get.docker.com | sh
+
+# Verify installation
+docker --version
+# Expected: Docker version 27.x or similar
+
+# Test with hello-world
+docker run --rm hello-world
+# Should print a welcome message
+
+✅ Screenshot: docker --version output + the hello-world success message.
+2. Install AWS CLI v2
+bash
+
+# Download and install
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscli2.zip"
+unzip awscli2.zip
+sudo ./aws/install
+
+# Verify
+aws --version
+# Expected: aws-cli/2.x ...
+
+✅ Screenshot: aws --version output.
+3. Install kind and kubectl
+bash
+
+# Install kind
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+
+# Install kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+
+# Verify both
+kind --version
+# Expected: kind v0.23.0 or similar
+kubectl version --client
+# Expected: Client Version: v1.30.x or similar
+
+✅ Screenshot: Output of kind --version and kubectl version --client.
+4. Install Helper Tools (optional but recommended)
+bash
+
+# OpenSSL is usually pre-installed, check:
+openssl version
+
+# Install oathtool for Lab 4
+sudo apt update
+sudo apt install oathtool -y
+
+# Verify
+oathtool --version
+
+✅ Screenshot (optional): openssl version and oathtool --version.
+5. Start LocalStack (the local AWS simulator)
+
+    Critical: The latest LocalStack requires a free auth token.
+    To avoid that, we use the legacy version 4.13.1 which works without a token.
+
+bash
+
+# Pull and run LocalStack 4.13.1 (no token required)
+docker run -d --name localstack -p 4566:4566 localstack/localstack:4.13.1
+
+# Wait 10-15 seconds for initialization
+sleep 15
+
+# Check health
+curl http://localhost:4566/_localstack/health
+# Expected: JSON with services listed as "available"
+
+If you see an empty JSON or {}, wait a few more seconds and try again.
+
+✅ Screenshot: The output of the curl health check (shows services running).
+6. Configure AWS CLI for LocalStack
+
+LocalStack accepts any credentials, so set dummy values once.
+bash
+
+aws configure set aws_access_key_id test
+aws configure set aws_secret_access_key test
+aws configure set region us-east-1
+
+To avoid typing --endpoint-url every time, set an environment variable:
+bash
+
+export EP='--endpoint-url=http://localhost:4566'
+
+Now test that the CLI talks to LocalStack:
+bash
+
+aws $EP sts get-caller-identity
+
+Expected output (example):
+json
+
+{
+    "UserId": "AKIAIOSFODNN7EXAMPLE",
+    "Account": "000000000000",
+    "Arn": "arn:aws:iam::000000000000:root"
+}
+
+✅ Screenshot: The output of aws $EP sts get-caller-identity.
+7. Create a Kubernetes Cluster with kind
+
+Create a cluster named ccse (as per the lab instructions):
+bash
+
+kind create cluster --name ccse
+
+If you are not in the docker group and get permission errors, use sudo:
+bash
+
+sudo kind create cluster --name ccse
+
+After creation, you need to get the kubeconfig file.
+If you used sudo, the config is owned by root; we need to fix that.
+bash
+
+# Create .kube directory if missing
+mkdir -p ~/.kube
+
+# Extract the kubeconfig and save it
+sudo kind get kubeconfig --name ccse > ~/.kube/config
+
+# Change ownership to your user
+sudo chown $USER:$USER ~/.kube/config
+chmod 600 ~/.kube/config
+
+Now verify the cluster is ready:
+bash
+
+kubectl config get-contexts
+# Should list kind-ccse
+
+kubectl config use-context kind-ccse
+kubectl get nodes
+# Expected: one node with STATUS Ready
+
+If you get an error about missing context, simply run:
+bash
+
+kubectl cluster-info --context kind-ccse
+
+✅ Screenshot: Output of kubectl get nodes showing the node Ready.
+8. (Optional) Install awslocal for convenience
+bash
+
+pip install awscli-local
+
+Now you can use awslocal instead of aws $EP.
+
+✅ Screenshot (optional): awslocal sts get-caller-identity.
+9. Pre‑Lab Verification Checklist
+
+Run these commands and confirm they work:
+
+    □
+
+    docker --version → prints version
+    □
+
+    aws --version → prints version
+    □
+
+    kind --version and kubectl version --client
+    □
+
+    curl http://localhost:4566/_localstack/health → returns JSON with services
+    □
+
+    aws $EP sts get-caller-identity → returns identity
+    □
+
+    kubectl get nodes → shows a Ready node
+
+✅ Screenshot: Run all these in a single terminal and take a screenshot showing all outputs (or separate screenshots for each if required).
+10. How to Stop and Clean Up (for later)
+bash
+
+# Stop LocalStack
+docker stop localstack
+
+# Stop and remove kind cluster
+kind delete cluster --name ccse
+
+# Remove all (if you want to start fresh)
+docker rm -f localstack
+kind delete clusters --all
+rm -rf ~/.kube
+rm -rf ~/.aws
+unset EP
+
+Handy One-Liners for Daily Use
+bash
+
+# Start LocalStack if stopped
+docker start localstack
+
+# Set endpoint variable each session
+export EP='--endpoint-url=http://localhost:4566'
+
+# Check what's running
+docker ps
+kind get clusters
+
+# Clean everything (frees disk)
+docker rm -f localstack
+kind delete clusters --all
+docker system prune -f
+

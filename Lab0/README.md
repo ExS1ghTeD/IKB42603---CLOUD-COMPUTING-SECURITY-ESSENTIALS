@@ -211,6 +211,21 @@ awslocal sts get-caller-identity
 ```
 
 ---
+## Start & Stop the Lab Environment
+
+For the LocalStack:
+```bash
+docker stop localstack    #to stop
+docker start localstack   #to start
+docker rm -f localstack   #to remove
+```
+
+For the kind cluster:
+```bash
+usr/local/bin/kind delete cluster --name ccse
+```
+
+---
 
 ## Troubleshooting
 

@@ -156,14 +156,31 @@ Screenshot:
 
 ### 7. Create a Kubernetes Cluster with kind
 
+Before begin, know where kind is:
+
+Command:
+
+```bash
+which kind
+```
+
+Expected output:
+
+```bash
+/usr/local/bin/kind
+```
+
+Then,
+
 Commands:
 
 ```bash
-kind create cluster --name ccse
+sudo /usr/local/bin/kind create cluster --name ccse
 mkdir -p ~/.kube
-sudo kind get kubeconfig --name ccse > ~/.kube/config
-sudo chown $USER:$USER ~/.kube/config
 chmod 600 ~/.kube/config
+sudo chown $USER:$USER ~/.kube/config
+sudo /usr/local/bin/kind get kubeconfig --name ccse
+sudo /usr/local/bin/kind get kubeconfig --name ccse > ~/.kube/config
 kubectl config use-context kind-ccse
 kubectl get nodes
 ```
@@ -171,7 +188,6 @@ kubectl get nodes
 Verification:
 
 - `kubectl config get-contexts`
-- `kubectl config use-context kind-ccse`
 - `kubectl get nodes` should show one node with `STATUS Ready`.
 
 Screenshot:

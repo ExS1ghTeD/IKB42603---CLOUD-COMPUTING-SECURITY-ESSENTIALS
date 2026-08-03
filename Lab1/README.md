@@ -57,7 +57,7 @@ Question 1:
 If the Analyst account were stolen, why is the damage limited compared to a
 stolen admin account? Connect your answer to blast-radius reduction.
 
-Answer: __________________________________________________________
+Answer: The damage is limited because its blast radius is tightly restricted by the principle of least privilege. Unlike a stolen admin account, it has an unlimited blast radius spanning the entire AWS infrastructure.
 
 ![No 3 task 3 enforce least privilege](screenshot/No_3_task_3_enforce_least_privilege.png)
 
@@ -136,7 +136,7 @@ Answer: __________________________________________________________
 
 Question 2:
 Which step is the service account passing, and which step is blocking the delete and the prod access?
-- Answer: __________________________________________________________
+- Answer: The service account passing should be in "list pods -n dev" step. The steps that is blocking the delete is the role definition itself. And the steps that blocking the prod access command is the RoleBinding scope.
 
 ---
 
@@ -151,24 +151,19 @@ Which step is the service account passing, and which step is blocking the delete
 2. Short-Answer Questions
 
 Q1. Why is attaching policies to groups better than attaching them directly to users?
-- _______________________________________________________________
-- _______________________________________________________________
+- It is better rather than attaching them directly to users because it makes user management much easier. The admin can change the permissions for many people at once rather than update it for each user one by one. 
 
 Q2. What is the difference between an IAM User and an IAM Role?
-- _______________________________________________________________
-- _______________________________________________________________
+- IAM User is a permanent identity with long-term credentials, like passwords and access keys, that meant for a specific person or application. IAM Role has no permanent credentials. It is a set of permissions that an entity can temporarily resume.
 
 Q3. Explain least privilege using the Analyst account, and how it reduces blast radius if compromised.
-- _______________________________________________________________
-- _______________________________________________________________
+- Least privilege means granting an AWS Analyst account the exactly needed permissions that they required to do the job neccessarily, and nothing more. By implementing this, it can reduce blast radius by prevent data deletion in the selected permissions of data, stops horizontal movement, prevents ransomware and limits data exposure.
 
 Q4. In Kubernetes, what is the difference between a Role and a RoleBinding?
-- _______________________________________________________________
-- _______________________________________________________________
+- A Role defines what actions can be performed, while a RoleBinding defines who can perform them.
 
 Q5. Why did the developer service account fail to access prod, and which security principle does that demonstrate?
-- _______________________________________________________________
-- _______________________________________________________________
+- The developer service account failed to access production because it was restricted by Kubernetes RBAC to a lower environment and lacked a RoleBinding or ClusterRoleBinding in the prod namespace.
 
 3. Verification Command
 
@@ -177,12 +172,3 @@ Q5. Why did the developer service account fail to access prod, and which securit
 ![Output of the following to prove the cluster RBAC is in place](screenshot/verification_command.png)
 
 ---
-
-## Conclusion
-Summarize your findings and answer the remaining guide questions below.
-
-- _______________________________________________________________________
-- _______________________________________________________________________
-- _______________________________________________________________________
-
-> Note: Replace the blank answer lines above with your responses once you complete the lab guide.

@@ -72,7 +72,7 @@ Answer: __________________________________________________________
 - Observations:
   - Identify inactive or stale access keys and keep only necessary keys active.
 
-![No 4 task 4 credential hygiene and access keys](screenshot/No_4_task_4_credential_hygiene_and_access_keys.png)
+![No 4 task 4 credential hygiene and access keys](screenshot/No_4_task_4_credential_hygiene_and_access_keys.jpg)
 
 ---
 

@@ -172,3 +172,8 @@ Q5. Why did the developer service account fail to access prod, and which securit
 ![Output of the following to prove the cluster RBAC is in place](screenshot/verification_command.png)
 
 ---
+
+## Conclusion
+
+This lab demonstrated how secure account and identity management reduce risk in AWS and Kubernetes environments. By verifying IAM identities, enforcing least privilege, auditing access keys, and applying Kubernetes RBAC with distinct `dev` and `prod` namespaces, the lab reinforced principles of secure access control and blast-radius reduction.
+

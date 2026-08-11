@@ -1,9 +1,9 @@
 # Lab 1 Report
 
-# Author Name
+## Author Name
 Syed (s1ght)
 
-# Date
+## Date
 30/07/2026
 
 ## Objective

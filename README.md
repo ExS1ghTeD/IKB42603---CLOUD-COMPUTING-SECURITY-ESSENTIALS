@@ -25,6 +25,7 @@ This repository contains all lab activities, quizzes, and assignments for the co
 
 - `Lab0` - introductory lab materials
 - `Lab1_Account_Security_and_IAM` - account security and IAM exercises
+- `Lab2_Secure_Isolation_and_Multitenancy` - secure isolation and multitenancy exercises
 - `Quiz - W2` - week 2 quiz materials
 
 ## Folder Structure
@@ -34,6 +35,8 @@ IKB42603---CLOUD-COMPUTING-SECURITY-ESSENTIALS
 │   └── screenshot
 ├── Lab1_Account_Security_and_IAM
 │   └── screenshot
+├── Lab2_Secure_Isolation_and_Multitenancy
+│   └── screenshot
 └── Quiz - W2
 ```
 
@@ -41,5 +44,3 @@ IKB42603---CLOUD-COMPUTING-SECURITY-ESSENTIALS
 
 - The current directory tree reflects the folders available in this workspace.
 - Screenshots are stored in each lab folder under `screenshot`.
-
-

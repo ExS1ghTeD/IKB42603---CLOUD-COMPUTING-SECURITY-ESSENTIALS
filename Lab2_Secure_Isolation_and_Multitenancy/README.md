@@ -1,7 +1,10 @@
 # IKB42603 Lab 2: Secure Isolation and Multitenancy
 
 ## Author Name
-Name: Syed (s1ght)
+Syed (s1ght)
+
+## Date
+11/08/2026
 
 ## Lab Objective
 This lab covers secure isolation and multitenancy in Kubernetes by setting up a KinD cluster with Calico networking, creating tenant namespaces, deploying isolated workloads, testing service connectivity, and enforcing resource quotas.

@@ -1,6 +1,10 @@
 # Lab 1 Report
 
-Date: 30/07/2026
+# Author Name
+Syed (s1ght)
+
+# Date
+30/07/2026
 
 ## Objective
 Document the Lab1 tasks, record the observed steps, include the commands used, and leave answer spaces for the guided questions.

@@ -1,5 +1,11 @@
 # IKB42603 – Cloud Computing Security Essentials
 
+## Author Name
+Syed (s1ght)
+
+## Date
+28/07/2026
+
 ## Objective
 
 Prepare the local environment for Lab 0 by installing and verifying the required tools for Cloud Computing Security Essentials. This includes Docker, AWS CLI v2, kind, kubectl, LocalStack, and a Kubernetes cluster, as well as configuring AWS CLI for LocalStack usage.

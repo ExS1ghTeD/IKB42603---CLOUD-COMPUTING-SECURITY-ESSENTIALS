@@ -134,3 +134,93 @@ kubectl describe resourcequota tenant-a-quota -n tenant-a
 - Calico CNI was installed and the `calico-node` pod reached `Running`.
 - Session A (Week) tasks were completed through deployment, service exposure, connectivity testing, and resource quota enforcement.
 - This report is captured in `README.md` with screenshots attached to each task.
+
+## Session B (Week 4) Completed
+The following tasks were completed for Session B (Week 4): default-deny network isolation, storage/secret isolation, and data remanence demonstration.
+
+### Task 4: Default-Deny Network Isolation
+- Applied a default-deny ingress `NetworkPolicy` to `tenant-b` so cross-tenant ingress is blocked.
+- Re-ran the same probe from `tenant-a` and observed that the probe could no longer reach `tenant-b` (timeout / failure).
+
+Commands used:
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: tenant-b
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+EOF
+
+# Re-run the probe from tenant-a (replace <B_IP>)
+kubectl -n tenant-a run probe --rm -it --image=curlimages/curl --restart=Never -- /bin/sh -c "curl -s -m 5 http://<B_IP> -o /dev/null -w 'HTTP %{http_code}\n'"
+```
+
+![Task 4 - Policy Created](screenshot/No_5_Task4.png)
+![Task 4 - Probe Fails](screenshot/No_6_Task4.png)
+
+> Screenshots: `No_5_Task4.png` shows the NetworkPolicy creation; `No_6_Task4.png` shows the probe timing out / failing after the policy.
+
+### Task 5: Storage & Secret Isolation
+- Created per-tenant secrets and a service account scoped to `tenant-a`.
+- Verified `kubectl auth can-i` shows `yes` for reading secrets in `tenant-a` and `no` for `tenant-b` when impersonating the tenant-a service account.
+
+Commands used:
+```bash
+kubectl -n tenant-a create secret generic data --from-literal=value=SECRET_A
+kubectl -n tenant-b create secret generic data --from-literal=value=SECRET_B
+
+kubectl -n tenant-a create serviceaccount app-a
+kubectl -n tenant-a create role reader --verb=get --resource=secrets
+kubectl -n tenant-a create rolebinding rb --role=reader --serviceaccount=tenant-a:app-a
+SA=system:serviceaccount:tenant-a:app-a
+kubectl auth can-i get secrets -n tenant-a --as=$SA
+kubectl auth can-i get secrets -n tenant-b --as=$SA
+```
+
+![Task 5 - Auth Check](screenshot/No_7_Task5.png)
+
+> Screenshot: `No_7_Task5.png` shows `yes` for `tenant-a` and `no` for `tenant-b` when impersonating the tenant-a service account.
+
+### Task 6: Data Remanence & Secure Deletion
+- Demonstrated that deleted files in a Docker volume may leave residual bytes and then performed an overwrite (secure wipe) before deletion.
+
+Commands used:
+```bash
+docker run --rm -v ccse-vol:/data alpine sh -c \
+ 'echo SENSITIVE-PATIENT-RECORD > /data/phi.txt; sync; rm /data/phi.txt; \ 
+ grep -a SENSITIVE /data/* 2>/dev/null; echo scan-done'
+
+docker run --rm -v ccse-vol:/data alpine sh -c \
+ 'echo SENSITIVE > /data/phi2.txt; sync; \
+ dd if=/dev/zero of=/data/phi2.txt bs=1k count=1 conv=notrunc; rm /data/phi2.txt; echo wiped'
+```
+
+![Task 6 - Remanence Scan & Secure Wipe](screenshot/No_8_Task6.png)
+
+> Screenshots: `No_8_Task6.png` shows the scan finding residual content; Below it shows the overwrite/wipe output.
+
+## Short-Answer Questions (with concise answers)
+
+Q1. Why can containers in different namespaces reach each other by default, and why is that dangerous in multi-tenant cloud?
+- A1: Namespaces are a logical grouping, not a network boundary. By default, Kubernetes allows cluster-internal pod networking, so tenants can reach each other which risks data exfiltration and lateral movement.
+
+Q2. Explain the default-deny principle and how your NetworkPolicy implements it.
+- A2: Default-deny means block all traffic unless explicitly allowed; the `NetworkPolicy` with empty `podSelector` and `policyTypes: [Ingress]` denies all ingress to pods in the namespace.
+
+Q3. How do virtual machines and containers differ in isolation strength? When would you add a VM boundary?
+- A3: VMs provide stronger isolation via separate kernels and hardware abstraction. Use a VM boundary when tenants require strong security, compliance, or untrusted workloads.
+
+Q4. What is data remanence, and why is cryptographic erasure the preferred cloud solution?
+- A4: Data remanence is leftover recoverable data after deletion. Cryptographic erasure (destroying encryption keys) is preferred because cloud providers abstract physical storage and it is efficient and reliable.
+
+Q5. Which of the three isolation dimensions (compute, network, storage) did each task exercise?
+- A5: Task 1 = compute (namespaces/containers), Task 2 = network (default-open proof), Task 3 = compute/resource quotas, Task 4 = network (NetworkPolicy), Task 5 = storage (secrets/RBAC), Task 6 = storage (remanence/wipe).
+
+## Verification Commands
+kubectl get networkpolicy -A
+kubectl describe resourcequota tenant-a-quota -n tenant-a
+

@@ -1,0 +1,2 @@
+Patient: Ahmad, Diagnosis: confidential
+x

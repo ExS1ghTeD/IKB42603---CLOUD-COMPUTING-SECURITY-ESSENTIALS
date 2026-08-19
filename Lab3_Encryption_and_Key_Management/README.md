@@ -262,4 +262,3 @@ docker stop tls 2>/dev/null
 rm -f record.* private.pem public.pem key.pem cert.pem datakey.* tampered.txt
 docker stop localstack && docker rm localstack
 ```
-```

@@ -1,0 +1,14 @@
+{
+  "Rules": [
+    {
+      "ID": "AutoDelete90Days",
+      "Filter": {
+        "Prefix": "confidential/"
+      },
+      "Status": "Enabled",
+      "Expiration": {
+        "Days": 90
+      }
+    }
+  ]
+}

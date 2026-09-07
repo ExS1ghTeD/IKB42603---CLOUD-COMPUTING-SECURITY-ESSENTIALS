@@ -450,17 +450,31 @@ sha256sum "$OUT"
 chmod +x evidence-collection.sh
 
 46. Run the script
-./evidence-collection.sh
-
+./evidence-collection.sh 
 MediPay technical evidence pack
-Collected: Sun Sep  6 01:47:45 PM UTC 2026 by Syed
-=== IAM-05 Least privilege on execution roles ===
+Collected: Mon Sep  7 06:52:24 PM UTC 2026 by Syed
+=== IAM-05 Least Privilege ===
 {
-    "PolicyNames": [
-        "PatientLookupReadOnly"
-    ]
+    "RoleName": "patient-lookup-role",
+    "PolicyName": "PatientLookupReadOnly",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetObject",
+                    "s3:ListBucket"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::medipay-patient-records",
+                    "arn:aws:s3:::medipay-patient-records/confidential/*"
+                ]
+            }
+        ]
+    }
 }
-=== IVS Tenant isolation & segmentation ===
+=== IVS-06 Segmentation and Segregation ===
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -500,7 +514,7 @@ Collected: Sun Sep  6 01:47:45 PM UTC 2026 by Syed
     ]
 }
 === LOG-07 / LOG-02 Management plane audit trail ===
-76 mgmt-trail.log
+105 mgmt-trail.log
 upload: ./mgmt-trail.sha256 to s3://miit-audit-trail/mgmt-trail.sha256
 === AIS-06 Pipeline security gate ===
 gate exit code: 0 (0 = policy satisfied, 1 = blocked)
@@ -518,5 +532,5 @@ gate exit code: 0 (0 = policy satisfied, 1 = blocked)
         "Enabled"
     ]
 ]
-67a00f79593de795fffa6d781db780df6e3e3f66fb531ea906b923521db8a4ce  evidence-20260906.txt
+660f1861367e99b8366da51982d3f89749b4b562be8f306a740efa22c52f94c3  evidence-20260908.txt
 

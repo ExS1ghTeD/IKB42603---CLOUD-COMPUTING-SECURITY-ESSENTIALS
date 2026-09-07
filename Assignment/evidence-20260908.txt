@@ -1,0 +1,81 @@
+MediPay technical evidence pack
+Collected: Mon Sep  7 06:52:24 PM UTC 2026 by Syed
+=== IAM-05 Least Privilege ===
+{
+    "RoleName": "patient-lookup-role",
+    "PolicyName": "PatientLookupReadOnly",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetObject",
+                    "s3:ListBucket"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::medipay-patient-records",
+                    "arn:aws:s3:::medipay-patient-records/confidential/*"
+                ]
+            }
+        ]
+    }
+}
+=== IVS-06 Segmentation and Segregation ===
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "EnforceTenantIsolation",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::medipay-patient-records/confidential/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:ExistingObjectTag/TenantID": "${aws:PrincipalTag/TenantID}"
+        }
+      }
+    }
+  ]
+}
+=== CEK-03 Encryption at rest ===
+{
+    "ApplyServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "aws:kms"
+    },
+    "BucketKeyEnabled": false,
+    "BlockedEncryptionTypes": {
+        "EncryptionType": [
+            "SSE-C"
+        ]
+    }
+}
+=== DSP-04 Data classification ===
+{
+    "TagSet": [
+        {
+            "Key": "classification",
+            "Value": "confidential"
+        }
+    ]
+}
+=== LOG-07 / LOG-02 Management plane audit trail ===
+105 mgmt-trail.log
+Completed 81 Bytes/81 Bytes (5.8 KiB/s) with 1 file(s) remainingupload: ./mgmt-trail.sha256 to s3://miit-audit-trail/mgmt-trail.sha256
+=== AIS-06 Pipeline security gate ===
+gate exit code: 0 (0 = policy satisfied, 1 = blocked)
+=== DSP-17 Public exposure guardrail ===
+{
+    "BlockPublicAcls": true,
+    "IgnorePublicAcls": true,
+    "BlockPublicPolicy": true,
+    "RestrictPublicBuckets": true
+}
+=== DSP-16 Retention and disposal ===
+[
+    [
+        "AutoDelete90Days",
+        "Enabled"
+    ]
+]

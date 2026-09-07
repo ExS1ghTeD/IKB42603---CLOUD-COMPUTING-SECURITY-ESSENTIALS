@@ -173,12 +173,30 @@ EOF
 aws $EP iam put-role-policy --role-name patient-lookup-role --policy-name PatientLookupReadOnly --policy-document file://least-privilege.json
 
 18. Verify the attach
-aws $EP iam list-role-policies --role-name patient-lookup-role --output json
+echo "=== IAM-05 (policy contents) ==="
+aws $EP iam get-role-policy --role-name patient-lookup-role --policy-name PatientLookupReadOnly
+
 {
-    "PolicyNames": [
-        "PatientLookupReadOnly"
-    ]
+    "RoleName": "patient-lookup-role",
+    "PolicyName": "PatientLookupReadOnly",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetObject",
+                    "s3:ListBucket"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::medipay-patient-records",
+                    "arn:aws:s3:::medipay-patient-records/confidential/*"
+                ]
+            }
+        ]
+    }
 }
+
 
 LOG-07
 19. Find the LocalStack container ID

@@ -412,10 +412,10 @@ LS_CONTAINER=$(docker ps -qf "ancestor=localstack/localstack")
 echo "MediPay technical evidence pack"
 echo "Collected: $(date -u) by Syed"
 
-echo "=== IAM-05 Least privilege on execution roles ==="
-aws $EP iam list-role-policies --role-name patient-lookup-role --output json
+echo "=== IAM-05 Least Privilege ==="
+aws $EP iam get-role-policy --role-name patient-lookup-role --policy-name PatientLookupReadOnly
 
-echo "=== IVS Tenant isolation & segmentation ==="
+echo "=== IVS-06 Segmentation and Segregation ==="
 aws $EP s3api get-bucket-policy --bucket $BUCKET --query 'Policy' --output text | jq .
 
 echo "=== CEK-03 Encryption at rest ==="

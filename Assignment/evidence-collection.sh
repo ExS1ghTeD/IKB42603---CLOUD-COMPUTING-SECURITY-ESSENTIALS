@@ -27,6 +27,7 @@ echo "=== LOG-07 / LOG-02 Management plane audit trail ==="
 docker logs "$LS_CONTAINER" 2>&1 | grep -E "AWS [a-z0-9]+\.[A-Za-z]+ =>" > mgmt-trail.log
 wc -l mgmt-trail.log
 sha256sum mgmt-trail.log > mgmt-trail.sha256
+cat mgmt-trail.sha256
 aws $EP s3 cp mgmt-trail.sha256 s3://miit-audit-trail/
 
 echo "=== AIS-06 Pipeline security gate ==="

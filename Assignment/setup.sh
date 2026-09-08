@@ -6,6 +6,10 @@
 
 set -e  # stop immediately if any command fails, so you notice right away
 
+docker start localstack  # make sure LocalStack is running before you run this script
+
+sleep 10 # wait for LocalStack to be ready
+
 export EP='--endpoint-url=http://localhost:4566'
 BUCKET='medipay-patient-records'
 AUDIT_BUCKET='miit-audit-trail'

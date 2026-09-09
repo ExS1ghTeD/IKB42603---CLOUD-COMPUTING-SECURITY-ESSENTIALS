@@ -1,0 +1,19 @@
+{
+"Version": "2012-10-17",
+"Statement":[
+{
+"Sid": "AllowAnalystInternal",
+"Effect": "Allow",
+"Principal": {"AWS": "arn:aws:iam::000000000000:user/DataAnalyst"},
+"Action": "s3:GetObject",
+"Resource": "arn:aws:s3:::miit-patient-records-17876/internal/*"
+},
+{
+"Sid": "DenyAnalystConfidential",
+"Effect": "Deny",
+"Principal": {"AWS": "arn:aws:iam::000000000000:user/DataAnalyst"},
+"Action": "s3:*",
+"Resource": "arn:aws:s3:::miit-patient-records-17876/confidential/*"
+}
+]
+}
